@@ -1,0 +1,53 @@
+// Copyright 2017 The Chromium Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+
+// https://immersive-web.github.io/webxr/#xrsession-interface
+enum XRSessionMode {
+  "inline",
+  "legacy-inline-ar",
+  "immersive-vr",
+  "immersive-ar",
+};
+
+enum XREnvironmentBlendMode {
+  "opaque",
+  "additive",
+  "alpha-blend",
+};
+
+[
+    ActiveScriptWrappable,
+    SecureContext,
+    Exposed=Window,
+    RuntimeEnabled=WebXR
+] interface XRSession : EventTarget {
+  readonly attribute XRSessionMode mode;
+  readonly attribute XREnvironmentBlendMode environmentBlendMode;
+  readonly attribute XRRenderState renderState;
+  readonly attribute XRSpace viewerSpace;
+
+  attribute EventHandler onblur;
+  attribute EventHandler onfocus;
+  attribute EventHandler onresetpose;
+  attribute EventHandler onend;
+
+  [RaisesException] void updateRenderState(XRRenderStateInit init);
+
+  [CallWith=ScriptState] Promise<XRReferenceSpace> requestReferenceSpace([PermissiveDictionaryConversion] XRReferenceSpaceOptions options);
+
+  long requestAnimationFrame(XRFrameRequestCallback callback);
+  void cancelAnimationFrame(long handle);
+
+  [MeasureAs=XRSessionGetInputSources] FrozenArray<XRInputSource> getInputSources();
+
+  [RuntimeEnabled=WebXRHitTest, CallWith=ScriptState] Promise<FrozenArray<XRHitResult>> requestHitTest(XRRay ray, XRSpace space);
+
+  [RuntimeEnabled=WebXRPlaneDetection] readonly attribute XRWorldTrackingState worldTrackingState;
+  // Configures a session with real-world understanding capabilities.
+  // More details can be found here:
+  // https://github.com/immersive-web/real-world-geometry/blob/master/plane-detection-explainer.md
+  [RuntimeEnabled=WebXRPlaneDetection] void updateWorldTrackingState(optional XRWorldTrackingStateInit state);
+
+  [CallWith=ScriptState] Promise<void> end();
+};
